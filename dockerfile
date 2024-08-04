@@ -2,7 +2,15 @@ FROM ubuntu:latest
 
 # Install system packages
 RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y libkrb5-dev libx11-dev libxkbfile-dev pkg-config libsecret-1-dev curl git
+    apt-get install -y \
+    libkrb5-dev \
+    libx11-dev \
+    libxkbfile-dev \
+    pkg-config \
+    libsecret-1-dev \
+    curl \
+    git \
+    build-essential
 
 # Install NVM and Node.js
 ENV NVM_DIR /root/.nvm
