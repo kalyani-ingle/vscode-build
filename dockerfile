@@ -28,6 +28,9 @@ RUN git checkout tags/1.92.0
 # Enable yarn
 RUN corepack enable yarn
 
+# Install Node.js dependencies
+RUN yarn install
+
 # Add "quality": "stable" to product.json
 RUN sed -i '/"quality"/c\  "quality": "stable",' product.json
 
