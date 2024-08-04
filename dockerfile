@@ -28,6 +28,10 @@ RUN git checkout tags/1.92.0
 # Enable yarn
 RUN corepack enable yarn
 
+
+# Debugging: List files to ensure package.json is present
+RUN ls -la
+
 # Install Node.js dependencies
 RUN yarn install
 
