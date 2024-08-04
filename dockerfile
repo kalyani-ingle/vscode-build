@@ -1,3 +1,4 @@
+# Use the latest Ubuntu image
 FROM ubuntu:latest
 
 # Install system packages
@@ -10,9 +11,10 @@ RUN apt-get update && apt-get upgrade -y && \
     libsecret-1-dev \
     curl \
     git \
-    build-essential
+    build-essential \
+    python3
 
-# Install NVM and Node.js
+# Install NVM (Node Version Manager) and Node.js
 ENV NVM_DIR /root/.nvm
 ENV NODE_VERSION 20.16.0
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash && \
@@ -23,31 +25,38 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | b
 
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
-# Clone VS Code repository
+# Clone the VS Code repository
 WORKDIR /vscode
 RUN git clone https://github.com/microsoft/vscode.git --branch=1.92.0 .
 
-# Fetch all tags
+# Fetch all tags and checkout the specific tag
 RUN git fetch --all --tags --prune
-
-# Checkout specific tag
 RUN git checkout tags/1.92.0
 
-# Enable yarn
+# Enable yarn using Corepack
 RUN corepack enable yarn
 
+# Clear Yarn cache
+RUN yarn cache clean
+
+# Install node-gyp globally
+RUN npm install -g node-gyp@latest
 
 # Debugging: List files to ensure package.json is present
 RUN ls -la
 
-# Install Node.js dependencies
-RUN yarn install
+# Check Node.js and npm versions
+RUN node -v
+RUN npm -v
+
+# Install Node.js dependencies with verbose logging
+RUN yarn install --verbose
 
 # Add "quality": "stable" to product.json
 RUN sed -i '/"quality"/c\  "quality": "stable",' product.json
 
 # Build VS Code
-RUN yarn && yarn gulp vscode-reh-web-linux-x64-min
+RUN yarn gulp vscode-reh-web-linux-x64-min
 
 # Set the entrypoint
 ENTRYPOINT ["./bin/runcode", "--default-folder", "/workspace"]
